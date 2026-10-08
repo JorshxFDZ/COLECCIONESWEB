@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jorge Fernández — Estilista</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✦</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+:root{
+  --black:#0A0A0A;--dark:#1A1918;--mid:#2E2C2B;--stone:#4A4745;
+  --warm-gray:#8A8480;--pale:#C8C3BC;--cream:#EDE8E0;--white:#F8F5F0;
+  --gold:#B89A6A;--gold-light:#D4B98A;--gold-dim:#7A6645;
+  --red:#C0392B;--green:#27AE60;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:auto} /* GSAP takes over */
+body{font-family:'Syne',sans-serif;background:var(--black);color:var(--cream);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+/* ── SCROLL PROGRESS ── */
+.scroll-progress{position:fixed;left:28px;top:50%;transform:translateY(-50%);z-index:99;display:flex;flex-direction:column;align-items:center;gap:6px}
+.sp-line-wrap{width:1px;height:120px;background:rgba(139,132,128,.15);position:relative;overflow:hidden}
+.sp-line-fill{position:absolute;top:0;left:0;width:100%;height:0%;background:var(--gold);transition:height .1s linear}
+.sp-label{font-size:8px;letter-spacing:2px;color:var(--stone);writing-mode:vertical-rl;transform:rotate(180deg)}
+@media(max-width:800px){.scroll-progress{display:none}}
+
+/* ── CURSOR ── */
+.cursor-dot{position:fixed;width:6px;height:6px;background:var(--gold);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:opacity .3s}
+.cursor-ring{position:fixed;width:36px;height:36px;border:1px solid rgba(184,154,106,.5);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .4s cubic-bezier(.25,.46,.45,.94),height .4s cubic-bezier(.25,.46,.45,.94),border-color .3s,opacity .3s}
+.cursor-label{position:fixed;pointer-events:none;z-index:9997;font-size:9px;letter-spacing:2px;color:var(--gold);transform:translate(-50%,14px);opacity:0;transition:opacity .25s;white-space:nowrap}
+.cursor-ring.expanded{width:72px;height:72px;border-color:rgba(184,154,106,.3)}
+.cursor-label.visible{opacity:1}
+@media(hover:none){.cursor-dot,.cursor-ring,.cursor-label{display:none}}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:28px 48px;display:flex;align-items:center;justify-content:space-between;transition:padding .4s,background .4s}
+nav.scrolled{padding:18px 48px;background:rgba(10,10,10,.92);backdrop-filter:blur(12px)}
+.nav-logo{font-family:'EB Garamond',serif;font-size:18px;letter-spacing:3px;color:var(--cream);text-decoration:none;font-style:italic;transition:opacity .3s}
+.nav-links{display:flex;gap:36px;list-style:none}
+.nav-links a{color:var(--warm-gray);text-decoration:none;font-size:11px;letter-spacing:2px;transition:color .25s;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:-3px;left:0;width:0;height:1px;background:var(--gold);transition:width .3s}
+.nav-links a:hover{color:var(--cream)}
+.nav-links a:hover::after{width:100%}
+.nav-admin-btn{background:none;border:1px solid var(--stone);color:var(--warm-gray);cursor:pointer;padding:8px 18px;font-family:'Syne',sans-serif;font-size:10px;letter-spacing:2px;transition:all .3s}
+.nav-admin-btn:hover{border-color:var(--gold);color:var(--gold)}
+@media(max-width:800px){nav{padding:20px 24px}.nav-links{display:none}nav.scrolled{padding:14px 24px}}
+
+/* ── HERO ── */
+.hero{height:100vh;min-height:600px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 55% 45%,#1c1610 0%,#0a0a0a 65%)}
+.hero-grain{position:absolute;inset:0;opacity:.35;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E")}
+
+/* Hero images — editorial composition */
+.hero-imgs{position:absolute;inset:0;pointer-events:none}
+.hero-img{position:absolute;overflow:hidden}
+.hero-img img{width:100%;height:100%;object-fit:cover;display:block}
+.hi-left{width:22vw;height:65vh;left:-2vw;top:50%;transform:translateY(-50%);opacity:.55}
+.hi-right{width:18vw;height:55vh;right:-1vw;top:55%;transform:translateY(-50%);opacity:.45}
+.hi-top-right{width:14vw;height:36vh;right:8vw;top:4vh;opacity:.3}
+.hi-bottom-left{width:13vw;height:28vh;left:10vw;bottom:4vh;opacity:.25}
+@media(max-width:800px){
+  .hi-left{width:36vw;height:50vh;left:-4vw;opacity:.35}
+  .hi-right{width:28vw;height:42vh;right:-3vw;opacity:.3}
+  .hi-top-right{display:none}.hi-bottom-left{display:none}
+}
+
+/* Placeholder image tile */
+.img-tile{width:100%;height:100%;background:var(--dark);display:flex;align-items:center;justify-content:center}
+.img-tile svg{opacity:.12}
+
+/* Hero text */
+.hero-content{position:relative;z-index:2;text-align:center}
+.hero-eyebrow{font-size:11px;letter-spacing:5px;color:var(--gold);margin-bottom:36px;font-weight:500;overflow:hidden}
+.hero-eyebrow-inner{display:block}
+.hero-name{font-family:'EB Garamond',serif;font-size:clamp(72px,11vw,156px);font-weight:400;line-height:.9;color:var(--white);overflow:hidden}
+.hero-name-line{display:block;overflow:hidden}
+.hero-name-inner{display:block}
+.hero-name em{font-style:italic;color:var(--gold-light)}
+.hero-title{font-size:11px;letter-spacing:6px;color:var(--warm-gray);margin-top:32px;overflow:hidden}
+.hero-title-inner{display:block}
+
+/* Scroll hint */
+.hero-scroll-hint{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px}
+.scroll-line-anim{width:1px;height:52px;background:linear-gradient(to bottom,var(--gold),transparent);animation:sdown 2.4s ease infinite}
+@keyframes sdown{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+.scroll-word{font-size:9px;letter-spacing:4px;color:var(--stone)}
+
+/* ── SECTIONS ── */
+.section{padding:130px 48px}
+@media(max-width:800px){.section{padding:80px 24px}}
+.section-label{font-size:10px;letter-spacing:4px;color:var(--gold);margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.section-label::before{content:'';display:block;width:0;height:1px;background:var(--gold);transition:width .6s}
+.section-label.in-view::before{width:24px}
+
+/* ── SOBRE MÍ ── */
+.about{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;border-top:1px solid var(--mid);padding-top:60px}
+@media(max-width:800px){.about{grid-template-columns:1fr;gap:48px}}
+.about-heading{font-family:'EB Garamond',serif;font-size:clamp(36px,4vw,58px);font-weight:400;line-height:1.1;margin-bottom:36px}
+.about-heading em{font-style:italic;color:var(--gold-light)}
+.about-word{display:inline-block;overflow:hidden}
+.about-word-inner{display:inline-block}
+.about-body{font-family:'EB Garamond',serif;font-size:18px;line-height:1.85;color:var(--pale);max-width:480px}
+.about-body p+p{margin-top:20px}
+.about-stat{padding:28px 0;border-bottom:1px solid var(--mid);display:flex;align-items:baseline;gap:16px;overflow:hidden}
+.about-stat:first-child{border-top:1px solid var(--mid)}
+.stat-n{font-family:'EB Garamond',serif;font-size:52px;color:var(--gold);line-height:1}
+.stat-txt{font-size:12px;letter-spacing:2px;color:var(--warm-gray);max-width:160px;line-height:1.5}
+
+/* ── COLLECTIONS HORIZONTAL SCROLL EXPERIENCE ── */
+.collections-wrapper{border-top:1px solid var(--mid)}
+.collections-intro{padding:80px 48px 48px;display:flex;align-items:flex-end;justify-content:space-between}
+@media(max-width:800px){.collections-intro{padding:60px 24px 32px;flex-direction:column;align-items:flex-start;gap:16px}}
+.collections-heading{font-family:'EB Garamond',serif;font-size:clamp(40px,5vw,72px);font-weight:400;line-height:1.05}
+.collections-heading em{font-style:italic;color:var(--gold-light)}
+.collections-sub{font-size:13px;color:var(--warm-gray);max-width:280px;text-align:right;line-height:1.7}
+@media(max-width:800px){.collections-sub{text-align:left}}
+
+/* PINNED HORIZONTAL SCROLL */
+.collections-pin{overflow:hidden}
+.collections-track{display:flex;width:fit-content}
+.col-moment{
+  width:100vw;height:90vh;
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;overflow:hidden;
+  cursor:pointer;
+}
+.col-moment-bg{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.col-moment-img{
+  position:absolute;width:42vw;height:75%;
+  overflow:hidden;
+}
+@media(max-width:800px){.col-moment-img{width:72vw;height:60%}}
+.col-moment-img img{width:100%;height:100%;object-fit:cover;display:block}
+.col-moment-content{
+  position:relative;z-index:2;
+  pointer-events:none;
+}
+.col-moment-num{
+  font-family:'EB Garamond',serif;
+  font-size:11px;letter-spacing:4px;
+  color:var(--stone);margin-bottom:20px;
+}
+.col-moment-name{
+  font-family:'EB Garamond',serif;
+  font-size:clamp(56px,8vw,110px);
+  font-weight:400;line-height:.9;
+  color:var(--white);
+  mix-blend-mode:difference;
+  position:absolute;
+}
+.col-moment-name.pos-tl{top:-10%;left:-30%}
+.col-moment-name.pos-tr{top:-10%;right:-30%;text-align:right}
+.col-moment-name.pos-bl{bottom:-10%;left:-30%}
+.col-moment-name.pos-br{bottom:-10%;right:-30%;text-align:right}
+.col-moment-meta{
+  position:absolute;bottom:10%;right:5%;
+  text-align:right;pointer-events:none;z-index:3;
+}
+.col-moment-year{font-size:10px;letter-spacing:3px;color:var(--stone);margin-bottom:8px}
+.col-moment-desc{
+  font-family:'EB Garamond',serif;
+  font-size:15px;color:var(--warm-gray);
+  line-height:1.7;max-width:280px;font-style:italic;
+}
+.col-open-hint{
+  position:absolute;bottom:10%;left:5%;
+  font-size:10px;letter-spacing:3px;color:var(--stone);
+  display:flex;align-items:center;gap:8px;
+  transition:color .3s;
+}
+.col-moment:hover .col-open-hint{color:var(--gold)}
+.col-hint-line{width:24px;height:1px;background:currentColor}
+
+/* Fallback list for when no images exist */
+.col-list-fallback{display:none}
+.col-card{display:grid;grid-template-columns:80px 1fr 1fr;border-top:1px solid var(--mid);padding:40px 0;cursor:pointer;transition:background .3s;position:relative}
+.col-card:last-child{border-bottom:1px solid var(--mid)}
+.col-card:hover{background:rgba(255,255,255,.02)}
+.col-num{font-family:'EB Garamond',serif;font-size:13px;color:var(--stone);font-style:italic;padding-top:4px}
+.col-name{font-family:'EB Garamond',serif;font-size:clamp(28px,3.5vw,52px);font-weight:400;line-height:1.05;margin-bottom:10px;transition:color .25s}
+.col-card:hover .col-name{color:var(--gold-light)}
+.col-year{font-size:10px;letter-spacing:3px;color:var(--stone)}
+.col-desc{font-family:'EB Garamond',serif;font-size:16px;color:var(--warm-gray);line-height:1.75;align-self:center;padding-left:40px}
+.col-arrow{position:absolute;right:0;top:50%;transform:translateY(-50%);font-size:18px;color:var(--stone);transition:all .3s}
+.col-card:hover .col-arrow{color:var(--gold);transform:translateY(-50%) translateX(6px)}
+@media(max-width:800px){.col-card{grid-template-columns:48px 1fr}.col-desc{display:none}}
+
+/* ── GALERÍA ── */
+.gallery-overlay{
+  position:fixed;inset:0;z-index:300;background:var(--black);
+  pointer-events:none;display:flex;flex-direction:column;
+  clip-path:circle(0% at 50% 50%);
+  transition:clip-path .6s cubic-bezier(.77,0,.18,1);
+}
+.gallery-overlay.open{pointer-events:all;clip-path:circle(150% at 50% 50%)}
+.gallery-top{display:flex;align-items:center;justify-content:space-between;padding:28px 48px;border-bottom:1px solid var(--mid);flex-shrink:0}
+.gallery-col-title{font-family:'EB Garamond',serif;font-size:22px;font-style:italic;color:var(--cream)}
+.gallery-col-desc{font-family:'EB Garamond',serif;font-size:14px;color:var(--warm-gray);font-style:italic;margin-top:4px;max-width:500px}
+.gallery-close-btn{background:none;border:none;cursor:pointer;font-size:22px;color:var(--warm-gray);font-family:'Syne',sans-serif;transition:color .2s;letter-spacing:1px}
+.gallery-close-btn:hover{color:var(--cream)}
+.gallery-grid{flex:1;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:3px;padding:3px;align-content:start}
+.g-item{aspect-ratio:3/4;background:var(--dark);position:relative;overflow:hidden;cursor:pointer;opacity:0;transform:translateY(20px);transition:opacity .5s,transform .5s}
+.g-item.revealed{opacity:1;transform:translateY(0)}
+.g-item img{width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.25,.46,.45,.94);display:block}
+.g-item:hover img{transform:scale(1.05)}
+.g-caption{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(10,10,10,.9),transparent);padding:32px 14px 14px;opacity:0;transform:translateY(6px);transition:all .3s;pointer-events:none}
+.g-item:hover .g-caption{opacity:1;transform:translateY(0)}
+.g-caption-text{font-family:'EB Garamond',serif;font-size:13px;font-style:italic;color:var(--pale);line-height:1.5}
+.g-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--stone)}
+.g-placeholder svg{opacity:.2}
+.g-placeholder span{font-size:10px;letter-spacing:2px}
+
+/* ── LIGHTBOX ── */
+.lightbox{position:fixed;inset:0;z-index:500;background:rgba(10,10,10,.97);display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
+.lightbox.open{opacity:1;pointer-events:all}
+.lb-close{position:absolute;top:24px;right:32px;background:none;border:none;cursor:pointer;font-size:26px;color:var(--warm-gray);transition:color .2s}
+.lb-close:hover{color:var(--cream)}
+.lb-img-wrap{max-width:min(700px,88vw);max-height:72vh;position:relative;overflow:hidden}
+.lb-img-wrap img{max-width:100%;max-height:72vh;object-fit:contain;display:block;transition:transform .4s cubic-bezier(.25,.46,.45,.94),opacity .35s}
+.lb-img-wrap img.sliding-out-left{transform:translateX(-60px);opacity:0}
+.lb-img-wrap img.sliding-out-right{transform:translateX(60px);opacity:0}
+.lb-img-wrap img.sliding-in-left{animation:slideInL .4s cubic-bezier(.25,.46,.45,.94) forwards}
+.lb-img-wrap img.sliding-in-right{animation:slideInR .4s cubic-bezier(.25,.46,.45,.94) forwards}
+@keyframes slideInL{from{transform:translateX(60px);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes slideInR{from{transform:translateX(-60px);opacity:0}to{transform:translateX(0);opacity:1}}
+.lb-caption{margin-top:20px;font-family:'EB Garamond',serif;font-size:17px;font-style:italic;color:var(--pale);text-align:center;max-width:520px;padding:0 24px;line-height:1.6;transition:opacity .3s}
+.lb-counter{position:absolute;bottom:24px;font-size:11px;letter-spacing:3px;color:var(--stone)}
+.lb-arrows{position:absolute;top:50%;left:0;right:0;display:flex;justify-content:space-between;padding:0 20px;transform:translateY(-50%);pointer-events:none}
+.lb-arrow{background:rgba(20,20,20,.7);border:none;cursor:pointer;color:var(--warm-gray);font-size:22px;width:48px;height:48px;display:flex;align-items:center;justify-content:center;pointer-events:all;transition:all .25s}
+.lb-arrow:hover{background:rgba(20,20,20,1);color:var(--cream)}
+
+/* ── CONTACTO ── */
+.contact-section{border-top:1px solid var(--mid);display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;padding-top:60px}
+@media(max-width:800px){.contact-section{grid-template-columns:1fr;gap:48px}}
+.contact-heading{font-family:'EB Garamond',serif;font-size:clamp(36px,4vw,58px);font-weight:400;line-height:1.1;margin-bottom:24px}
+.contact-heading em{font-style:italic;color:var(--gold-light)}
+.contact-left p{font-family:'EB Garamond',serif;font-size:17px;color:var(--pale);line-height:1.8;max-width:380px;margin-bottom:40px}
+.contact-link{display:flex;align-items:center;gap:16px;text-decoration:none;color:var(--cream);border-bottom:1px solid var(--mid);padding:18px 0;transition:all .25s;position:relative;overflow:hidden}
+.contact-link::after{content:'→';position:absolute;right:0;opacity:0;transform:translateX(-10px);transition:all .25s}
+.contact-link:hover{color:var(--gold);padding-left:6px}
+.contact-link:hover::after{opacity:1;transform:translateX(0)}
+.cl-label{font-size:10px;letter-spacing:3px;color:var(--stone);flex:0 0 80px}
+.form-field{display:flex;flex-direction:column;border-bottom:1px solid var(--mid);padding:20px 0;transition:border-color .3s}
+.form-field:focus-within{border-color:var(--gold)}
+.form-label{font-size:9px;letter-spacing:3px;color:var(--stone);margin-bottom:8px;transition:color .3s}
+.form-field:focus-within .form-label{color:var(--gold-dim)}
+.form-input,.form-textarea{background:none;border:none;outline:none;font-family:'EB Garamond',serif;font-size:16px;color:var(--cream);resize:none}
+.form-input::placeholder,.form-textarea::placeholder{color:var(--mid)}
+.form-textarea{min-height:80px}
+.form-submit{margin-top:36px;background:none;border:none;cursor:pointer;padding:0;font-family:'Syne',sans-serif;font-size:12px;letter-spacing:3px;color:var(--warm-gray);align-self:flex-start;position:relative;display:flex;align-items:center;gap:16px;transition:color .3s}
+.form-submit::before{content:'';display:block;width:32px;height:1px;background:currentColor;transition:width .4s}
+.form-submit:hover{color:var(--gold)}
+.form-submit:hover::before{width:56px}
+
+/* ── REDES / FOOTER ── */
+.social-section{padding:80px 48px;border-top:1px solid var(--mid);display:flex;align-items:center;justify-content:space-between}
+@media(max-width:800px){.social-section{flex-direction:column;gap:32px;text-align:center;padding:60px 24px}}
+.social-label{font-family:'EB Garamond',serif;font-size:28px;font-style:italic;color:var(--warm-gray)}
+.social-links{display:flex;gap:32px}
+.social-link{text-decoration:none;font-size:11px;letter-spacing:3px;color:var(--warm-gray);position:relative;padding-bottom:3px;transition:color .25s}
+.social-link::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--gold);transition:width .3s}
+.social-link:hover{color:var(--gold)}
+.social-link:hover::after{width:100%}
+footer{padding:40px 48px;border-top:1px solid var(--mid);display:flex;align-items:center;justify-content:space-between}
+@media(max-width:800px){footer{flex-direction:column;gap:12px;text-align:center;padding:32px 24px}}
+footer p{font-size:11px;color:var(--stone);letter-spacing:1px}
+.footer-logo{font-family:'EB Garamond',serif;font-size:14px;font-style:italic;color:var(--stone);letter-spacing:3px}
+
+/* ══════════════════════════════════
+   PANEL DE ADMINISTRACIÓN
+══════════════════════════════════ */
+.admin-login{position:fixed;inset:0;z-index:800;background:rgba(10,10,10,.97);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.admin-login.open{opacity:1;pointer-events:all}
+.login-box{width:min(400px,90vw);padding:48px 40px;border:1px solid var(--mid);background:var(--dark)}
+.login-box h2{font-family:'EB Garamond',serif;font-size:28px;font-style:italic;color:var(--cream);margin-bottom:8px}
+.login-box p{font-size:11px;letter-spacing:2px;color:var(--stone);margin-bottom:36px}
+.login-field{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.login-field label{font-size:10px;letter-spacing:2px;color:var(--stone)}
+.login-field input{background:var(--black);border:1px solid var(--mid);color:var(--cream);padding:13px 16px;font-family:'Syne',sans-serif;font-size:14px;outline:none;transition:border-color .2s}
+.login-field input:focus{border-color:var(--gold)}
+.login-err{font-size:12px;color:var(--red);margin-bottom:16px;min-height:18px;letter-spacing:.5px}
+.login-btn{width:100%;background:var(--gold);color:var(--black);border:none;cursor:pointer;padding:14px;font-family:'Syne',sans-serif;font-size:11px;letter-spacing:3px;font-weight:700;transition:background .2s}
+.login-btn:hover{background:var(--gold-light)}
+.login-cancel{width:100%;margin-top:10px;background:none;border:1px solid var(--stone);color:var(--warm-gray);cursor:pointer;padding:12px;font-family:'Syne',sans-serif;font-size:11px;letter-spacing:2px;transition:all .2s}
+.login-cancel:hover{border-color:var(--cream);color:var(--cream)}
+.admin-panel{position:fixed;inset:0;z-index:700;background:var(--black);display:flex;opacity:0;pointer-events:none;transition:opacity .3s}
+.admin-panel.open{opacity:1;pointer-events:all}
+.admin-sidebar{width:220px;flex-shrink:0;background:var(--dark);border-right:1px solid var(--mid);display:flex;flex-direction:column;padding:32px 0}
+.admin-brand{padding:0 24px 32px;border-bottom:1px solid var(--mid);margin-bottom:16px}
+.admin-brand h1{font-family:'EB Garamond',serif;font-size:18px;font-style:italic;color:var(--cream)}
+.admin-brand p{font-size:10px;letter-spacing:2px;color:var(--stone);margin-top:4px}
+.admin-nav{display:flex;flex-direction:column;flex:1}
+.admin-nav-item{display:flex;align-items:center;gap:12px;padding:13px 24px;cursor:pointer;transition:all .2s;border-left:2px solid transparent;font-size:12px;letter-spacing:1.5px;color:var(--warm-gray)}
+.admin-nav-item:hover{color:var(--cream);background:rgba(255,255,255,.03)}
+.admin-nav-item.active{color:var(--gold);border-left-color:var(--gold);background:rgba(184,154,106,.06)}
+.admin-nav-item .icon{font-size:15px;width:20px;text-align:center}
+.admin-logout{margin:16px 24px 0;padding:12px;border:1px solid var(--mid);background:none;cursor:pointer;font-family:'Syne',sans-serif;font-size:10px;letter-spacing:2px;color:var(--stone);transition:all .2s}
+.admin-logout:hover{border-color:var(--red);color:var(--red)}
+.admin-version{padding:16px 24px 0;font-size:10px;color:var(--stone);letter-spacing:1px}
+.admin-content{flex:1;overflow-y:auto;padding:48px 56px}
+.admin-tab{display:none}.admin-tab.active{display:block}
+.admin-tab-title{font-family:'EB Garamond',serif;font-size:36px;font-style:italic;color:var(--cream);margin-bottom:8px}
+.admin-tab-sub{font-size:11px;letter-spacing:2px;color:var(--stone);margin-bottom:48px}
+.admin-card{background:var(--dark);border:1px solid var(--mid);padding:28px 32px;margin-bottom:20px}
+.admin-card-title{font-size:10px;letter-spacing:3px;color:var(--gold);margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--mid)}
+.admin-row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.a-field{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
+.a-field:last-child{margin-bottom:0}
+.a-field label{font-size:10px;letter-spacing:2px;color:var(--stone)}
+.a-field input,.a-field textarea,.a-field select{background:var(--black);border:1px solid var(--mid);color:var(--cream);padding:11px 14px;font-family:'EB Garamond',serif;font-size:15px;outline:none;transition:border-color .2s;resize:vertical}
+.a-field input:focus,.a-field textarea:focus{border-color:var(--gold)}
+.a-field textarea{min-height:80px}
+.a-field .hint{font-size:11px;color:var(--stone);font-style:italic;font-family:'EB Garamond',serif}
+.btn-save{background:var(--gold);color:var(--black);border:none;cursor:pointer;padding:13px 32px;font-family:'Syne',sans-serif;font-size:11px;letter-spacing:2px;font-weight:700;transition:background .2s}
+.btn-save:hover{background:var(--gold-light)}
+.btn-danger{background:none;border:1px solid var(--red);color:var(--red);cursor:pointer;padding:10px 24px;font-family:'Syne',sans-serif;font-size:10px;letter-spacing:2px;transition:all .2s}
+.btn-danger:hover{background:var(--red);color:#fff}
+.btn-sec{background:none;border:1px solid var(--stone);color:var(--warm-gray);cursor:pointer;padding:10px 24px;font-family:'Syne',sans-serif;font-size:10px;letter-spacing:2px;transition:all .2s}
+.btn-sec:hover{border-color:var(--cream);color:var(--cream)}
+.save-row{display:flex;align-items:center;gap:16px;margin-top:24px;flex-wrap:wrap}
+.save-note{font-size:11px;color:var(--stone);font-family:'EB Garamond',serif;font-style:italic}
+.col-admin-block{background:var(--dark);border:1px solid var(--mid);padding:24px;margin-bottom:12px}
+.col-admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;cursor:pointer}
+.col-admin-header h4{font-family:'EB Garamond',serif;font-size:20px;font-style:italic;color:var(--cream)}
+.col-admin-toggle{font-size:18px;color:var(--stone);transition:transform .3s}
+.col-admin-block.collapsed .col-admin-toggle{transform:rotate(-90deg)}
+.col-admin-body{display:block}
+.col-admin-block.collapsed .col-admin-body{display:none}
+.admin-gallery-col{background:var(--dark);border:1px solid var(--mid);padding:24px;margin-bottom:12px}
+.agc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.agc-name{font-family:'EB Garamond',serif;font-size:18px;font-style:italic;color:var(--cream)}
+.agc-count{font-size:10px;letter-spacing:2px;color:var(--stone)}
+.agc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px}
+.agc-thumb{aspect-ratio:3/4;position:relative;background:var(--black);overflow:hidden}
+.agc-thumb img{width:100%;height:100%;object-fit:cover}
+.agc-thumb-actions{position:absolute;inset:0;background:rgba(10,10,10,.75);opacity:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;transition:opacity .2s}
+.agc-thumb:hover .agc-thumb-actions{opacity:1}
+.agc-action{background:none;border:1px solid rgba(255,255,255,.2);color:var(--cream);cursor:pointer;font-size:10px;letter-spacing:1px;padding:6px 12px;font-family:'Syne',sans-serif;transition:all .2s;width:80%}
+.agc-action:hover{background:rgba(255,255,255,.1)}
+.agc-action.del{border-color:rgba(192,57,43,.5);color:var(--red)}
+.agc-action.del:hover{background:var(--red);color:#fff;border-color:var(--red)}
+.agc-add{aspect-ratio:3/4;border:1px dashed var(--stone);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:all .2s;background:none}
+.agc-add:hover{border-color:var(--gold);background:rgba(184,154,106,.05)}
+.agc-add span{font-size:9px;letter-spacing:2px;color:var(--warm-gray)}
+.agc-add svg{opacity:.4}
+.caption-modal{position:fixed;inset:0;z-index:900;background:rgba(10,10,10,.85);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.caption-modal.open{opacity:1;pointer-events:all}
+.caption-box{background:var(--dark);border:1px solid var(--mid);padding:36px;width:min(480px,90vw)}
+.caption-box h3{font-family:'EB Garamond',serif;font-size:22px;font-style:italic;color:var(--cream);margin-bottom:20px}
+.caption-box textarea{width:100%;background:var(--black);border:1px solid var(--mid);color:var(--cream);font-family:'EB Garamond',serif;font-size:16px;padding:14px;resize:vertical;min-height:100px;outline:none;transition:border-color .2s}
+.caption-box textarea:focus{border-color:var(--gold)}
+.caption-hint{font-size:11px;color:var(--stone);margin-top:8px;font-family:'EB Garamond',serif;font-style:italic}
+.caption-actions{display:flex;gap:10px;margin-top:16px;justify-content:flex-end}
+@media(max-width:800px){
+  .admin-panel{flex-direction:column}
+  .admin-sidebar{width:100%;padding:16px 0}
+  .admin-nav{flex-direction:row;overflow-x:auto}
+  .admin-nav-item{flex-shrink:0;border-left:none;border-bottom:2px solid transparent;font-size:10px;padding:10px 16px}
+  .admin-nav-item.active{border-left:none;border-bottom-color:var(--gold)}
+  .admin-content{padding:24px}
+  .admin-row{grid-template-columns:1fr}
+}
+.toast{position:fixed;bottom:32px;right:32px;z-index:1000;background:var(--dark);border:1px solid var(--mid);color:var(--cream);padding:14px 24px;font-size:12px;letter-spacing:1px;transform:translateY(20px);opacity:0;transition:all .3s;pointer-events:none;max-width:320px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{border-color:var(--green)}
+.toast.err{border-color:var(--red)}
+</style>
+</head>
+<body>
+
+<!-- SCROLL PROGRESS -->
+<div class="scroll-progress">
+  <div class="sp-label">SCROLL</div>
+  <div class="sp-line-wrap"><div class="sp-line-fill" id="sp-fill"></div></div>
+</div>
+
+<!-- CURSOR -->
+<div class="cursor-dot" id="c-dot"></div>
+<div class="cursor-ring" id="c-ring"></div>
+<div class="cursor-label" id="c-label"></div>
+
+<!-- NAV -->
+<nav id="main-nav">
+  <a href="#" class="nav-logo">Jorge Fernández</a>
+  <ul class="nav-links">
+    <li><a href="#sobre-mi">Sobre mí</a></li>
+    <li><a href="#colecciones">Colecciones</a></li>
+    <li><a href="#contacto">Contacto</a></li>
+  </ul>
+  <button class="nav-admin-btn" onclick="openLogin()">⚙ Admin</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grain"></div>
+  <!-- Editorial image composition -->
+  <div class="hero-imgs">
+    <div class="hero-img hi-left" id="hi-left">
+      <div class="img-tile" id="hi-left-inner">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width=".8"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+      </div>
+    </div>
+    <div class="hero-img hi-right" id="hi-right">
+      <div class="img-tile" id="hi-right-inner">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width=".8"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+      </div>
+    </div>
+    <div class="hero-img hi-top-right" id="hi-tr">
+      <div class="img-tile">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width=".8"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+      </div>
+    </div>
+    <div class="hero-img hi-bottom-left" id="hi-bl">
+      <div class="img-tile">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width=".8"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+      </div>
+    </div>
+  </div>
+  <div class="hero-content" id="hero-content">
+    <div class="hero-eyebrow"><span class="hero-eyebrow-inner" id="hero-eyebrow">Estilista · Granada, España</span></div>
+    <h1 class="hero-name">
+      <span class="hero-name-line"><span class="hero-name-inner" id="hero-name-jorge">Jorge</span></span>
+      <span class="hero-name-line"><em class="hero-name-inner" id="hero-name-fer">Fernández</em></span>
+    </h1>
+    <div class="hero-title"><span class="hero-title-inner" id="hero-title">Dirección artística · Estilismo · Imagen</span></div>
+  </div>
+  <div class="hero-scroll-hint">
+    <div class="scroll-line-anim"></div>
+    <div class="scroll-word">Scroll</div>
+  </div>
+</section>
+
+<!-- SOBRE MÍ -->
+<section class="section" id="sobre-mi">
+  <div class="about">
+    <div class="about-left">
+      <div class="section-label" id="sl-about">Sobre mí</div>
+      <h2 class="about-heading" id="about-heading">
+        <span class="about-word"><span class="about-word-inner">Cabello</span></span>
+        <span class="about-word"> <span class="about-word-inner">como</span></span>
+        <br>
+        <span class="about-word"><em class="about-word-inner">lenguaje</em></span>
+        <span class="about-word"> <span class="about-word-inner">visual.</span></span>
+      </h2>
+      <div class="about-body" id="about-body">
+        <p id="about-p1">Soy Jorge Fernández, estilista y creativo de Granada, España. Mi formación es en Estilismo y Dirección de Peluquería, aunque lo que me mueve es la parte más visual y conceptual del oficio.</p>
+        <p id="about-p2">Me interesa la intersección entre cabello, moda, fotografía y cultura visual. Quiero que cada colección sea un concepto propio, no solo un peinado: que cuente algo, que tenga identidad, que deje huella.</p>
+      </div>
+    </div>
+    <div class="about-right" id="about-stats">
+      <div class="about-stat"><div class="stat-n" id="stat-n1">5</div><div class="stat-txt" id="stat-txt1">Colecciones creadas</div></div>
+      <div class="about-stat"><div class="stat-n" id="stat-n2">Granada</div><div class="stat-txt" id="stat-txt2">Base de operaciones</div></div>
+      <div class="about-stat"><div class="stat-n" id="stat-n3">∞</div><div class="stat-txt" id="stat-txt3">Conceptos por explorar</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- COLECCIONES -->
+<div class="collections-wrapper" id="colecciones">
+  <div class="collections-intro">
+    <h2 class="collections-heading" id="col-heading">Las <em>colecciones</em></h2>
+    <p class="collections-sub">Cada colección es un concepto. Un mundo visual propio con identidad y dirección artística.</p>
+  </div>
+  <!-- Horizontal editorial experience -->
+  <div class="collections-pin" id="col-pin">
+    <div class="collections-track" id="col-track"></div>
+  </div>
+  <!-- Fallback list -->
+  <div style="padding:0 48px 80px" id="col-list-wrap">
+    <div class="col-list" id="col-list"></div>
+  </div>
+</div>
+
+<!-- CONTACTO -->
+<section class="section" id="contacto">
+  <div class="contact-section">
+    <div class="contact-left">
+      <div class="section-label" id="sl-contact">Contacto</div>
+      <h2 class="contact-heading" id="contact-heading">Hablemos de tu <em>próximo proyecto.</em></h2>
+      <p id="contact-desc">Disponible para colaboraciones, editoriales, dirección artística y proyectos creativos. Basado en Granada, con disponibilidad para desplazamientos.</p>
+      <div class="contact-links" id="contact-links-el">
+        <a class="contact-link" id="link-email" href="#"><span class="cl-label">Email</span><span id="contact-email">hola@jorgefernandez.com</span></a>
+        <a class="contact-link" id="link-phone" href="#"><span class="cl-label">Teléfono</span><span id="contact-phone">+34 600 000 000</span></a>
+        <a class="contact-link" href="#"><span class="cl-label">Ubicación</span><span id="contact-location">Granada, España</span></a>
+      </div>
+    </div>
+    <div class="contact-right" id="contact-form-el">
+      <div class="section-label">Escríbeme</div>
+      <div style="display:flex;flex-direction:column">
+        <div class="form-field"><label class="form-label">Nombre</label><input type="text" class="form-input" placeholder="Tu nombre"></div>
+        <div class="form-field"><label class="form-label">Email</label><input type="email" class="form-input" placeholder="tu@email.com"></div>
+        <div class="form-field"><label class="form-label">Proyecto</label><textarea class="form-textarea" placeholder="Cuéntame en qué puedo ayudarte..."></textarea></div>
+        <button class="form-submit" onclick="submitForm()">Enviar mensaje</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REDES -->
+<div class="social-section">
+  <div class="social-label">Sígueme</div>
+  <div class="social-links">
+    <a href="#" class="social-link" id="social-ig">Instagram</a>
+    <a href="#" class="social-link" id="social-tt">TikTok</a>
+    <a href="#" class="social-link" id="social-li">LinkedIn</a>
+  </div>
+</div>
+<footer>
+  <p id="footer-copy">© 2026 Jorge Fernández. Todos los derechos reservados.</p>
+  <div class="footer-logo">JF ✦</div>
+</footer>
+
+<!-- GALERÍA -->
+<div class="gallery-overlay" id="gallery-overlay">
+  <div class="gallery-top">
+    <div>
+      <div class="gallery-col-title" id="g-title"></div>
+      <div class="gallery-col-desc" id="g-desc"></div>
+    </div>
+    <button class="gallery-close-btn" onclick="closeGallery()">✕ Cerrar</button>
+  </div>
+  <div class="gallery-grid" id="gallery-grid"></div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="lbBgClose(event)">
+  <button class="lb-close" onclick="closeLb()">✕</button>
+  <div class="lb-arrows">
+    <button class="lb-arrow" onclick="lbNav(-1)">←</button>
+    <button class="lb-arrow" onclick="lbNav(1)">→</button>
+  </div>
+  <div class="lb-img-wrap"><img id="lb-img" src="" alt=""></div>
+  <div id="lb-caption" class="lb-caption"></div>
+  <div class="lb-counter" id="lb-counter"></div>
+</div>
+
+<!-- LOGIN ADMIN -->
+<div class="admin-login" id="admin-login">
+  <div class="login-box">
+    <h2>Panel de administración</h2>
+    <p>Acceso exclusivo · Jorge Fernández</p>
+    <div class="login-field"><label>Contraseña</label><input type="password" id="pwd-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="login-err" id="login-err"></div>
+    <button class="login-btn" onclick="doLogin()">Entrar al panel</button>
+    <button class="login-cancel" onclick="closeLogin()">Cancelar</button>
+  </div>
+</div>
+
+<!-- PANEL ADMIN -->
+<div class="admin-panel" id="admin-panel">
+  <div class="admin-sidebar">
+    <div class="admin-brand"><h1>Admin Panel</h1><p>Jorge Fernández ✦</p></div>
+    <div class="admin-nav">
+      <div class="admin-nav-item active" onclick="switchTab('general')"><span class="icon">⚙</span> General</div>
+      <div class="admin-nav-item" onclick="switchTab('sobre')"><span class="icon">👤</span> Sobre mí</div>
+      <div class="admin-nav-item" onclick="switchTab('colecciones')"><span class="icon">✦</span> Colecciones</div>
+      <div class="admin-nav-item" onclick="switchTab('galeria')"><span class="icon">🖼</span> Galería</div>
+      <div class="admin-nav-item" onclick="switchTab('contacto')"><span class="icon">📬</span> Contacto</div>
+      <div class="admin-nav-item" onclick="switchTab('redes')"><span class="icon">🔗</span> Redes</div>
+      <div class="admin-nav-item" onclick="switchTab('seguridad')"><span class="icon">🔒</span> Seguridad</div>
+    </div>
+    <button class="admin-logout" onclick="logout()">Cerrar sesión</button>
+    <div class="admin-version">v2.0 · JF Studio</div>
+  </div>
+  <div class="admin-content">
+    <div class="admin-tab active" id="tab-general">
+      <div class="admin-tab-title">General</div>
+      <div class="admin-tab-sub">Textos del hero y pie de página</div>
+      <div class="admin-card">
+        <div class="admin-card-title">CABECERA (HERO)</div>
+        <div class="a-field"><label>Subtítulo del hero</label><input type="text" id="a-eyebrow"><span class="hint">Ej: Estilista · Granada, España</span></div>
+        <div class="a-field"><label>Especialidades</label><input type="text" id="a-htitle"></div>
+      </div>
+      <div class="admin-card">
+        <div class="admin-card-title">PIE DE PÁGINA</div>
+        <div class="a-field"><label>Texto copyright</label><input type="text" id="a-copy"></div>
+      </div>
+      <div class="save-row"><button class="btn-save" onclick="saveGeneral()">✦ Guardar</button></div>
+    </div>
+    <div class="admin-tab" id="tab-sobre">
+      <div class="admin-tab-title">Sobre mí</div>
+      <div class="admin-tab-sub">Biografía y datos destacados</div>
+      <div class="admin-card">
+        <div class="admin-card-title">TEXTO BIOGRÁFICO</div>
+        <div class="a-field"><label>Párrafo 1</label><textarea id="a-p1"></textarea></div>
+        <div class="a-field"><label>Párrafo 2</label><textarea id="a-p2"></textarea></div>
+      </div>
+      <div class="admin-card">
+        <div class="admin-card-title">DATOS DESTACADOS</div>
+        <div class="admin-row"><div class="a-field"><label>Dato 1 — Valor</label><input type="text" id="a-s1n"></div><div class="a-field"><label>Dato 1 — Descripción</label><input type="text" id="a-s1t"></div></div>
+        <div class="admin-row"><div class="a-field"><label>Dato 2 — Valor</label><input type="text" id="a-s2n"></div><div class="a-field"><label>Dato 2 — Descripción</label><input type="text" id="a-s2t"></div></div>
+        <div class="admin-row"><div class="a-field"><label>Dato 3 — Valor</label><input type="text" id="a-s3n"></div><div class="a-field"><label>Dato 3 — Descripción</label><input type="text" id="a-s3t"></div></div>
+      </div>
+      <div class="save-row"><button class="btn-save" onclick="saveSobre()">✦ Guardar</button></div>
+    </div>
+    <div class="admin-tab" id="tab-colecciones">
+      <div class="admin-tab-title">Colecciones</div>
+      <div class="admin-tab-sub">Nombre, año y descripción</div>
+      <div id="admin-cols-list"></div>
+      <div class="save-row"><button class="btn-save" onclick="saveColecciones()">✦ Guardar</button><button class="btn-sec" onclick="addColeccion()">+ Nueva colección</button></div>
+    </div>
+    <div class="admin-tab" id="tab-galeria">
+      <div class="admin-tab-title">Galería</div>
+      <div class="admin-tab-sub">Imágenes y descripciones</div>
+      <div id="admin-gallery-list"></div>
+    </div>
+    <div class="admin-tab" id="tab-contacto">
+      <div class="admin-tab-title">Contacto</div>
+      <div class="admin-tab-sub">Información de contacto pública</div>
+      <div class="admin-card"><div class="admin-card-title">TEXTO</div><div class="a-field"><textarea id="a-cdesc"></textarea></div></div>
+      <div class="admin-card"><div class="admin-card-title">DATOS</div>
+        <div class="a-field"><label>Email</label><input type="text" id="a-email"></div>
+        <div class="a-field"><label>Teléfono</label><input type="text" id="a-phone"></div>
+        <div class="a-field"><label>Ubicación</label><input type="text" id="a-loc"></div>
+      </div>
+      <div class="save-row"><button class="btn-save" onclick="saveContacto()">✦ Guardar</button></div>
+    </div>
+    <div class="admin-tab" id="tab-redes">
+      <div class="admin-tab-title">Redes sociales</div>
+      <div class="admin-tab-sub">URLs de tus perfiles</div>
+      <div class="admin-card"><div class="admin-card-title">ENLACES</div>
+        <div class="a-field"><label>Instagram</label><input type="text" id="a-ig" placeholder="https://instagram.com/..."></div>
+        <div class="a-field"><label>TikTok</label><input type="text" id="a-tt" placeholder="https://tiktok.com/..."></div>
+        <div class="a-field"><label>LinkedIn</label><input type="text" id="a-li" placeholder="https://linkedin.com/..."></div>
+      </div>
+      <div class="save-row"><button class="btn-save" onclick="saveRedes()">✦ Guardar</button></div>
+    </div>
+    <div class="admin-tab" id="tab-seguridad">
+      <div class="admin-tab-title">Seguridad</div>
+      <div class="admin-tab-sub">Contraseña del panel</div>
+      <div class="admin-card"><div class="admin-card-title">CAMBIAR CONTRASEÑA</div>
+        <div class="a-field"><label>Contraseña actual</label><input type="password" id="pwd-old"></div>
+        <div class="a-field"><label>Nueva contraseña</label><input type="password" id="pwd-new"></div>
+        <div class="a-field"><label>Confirmar</label><input type="password" id="pwd-confirm"></div>
+        <div class="save-row"><button class="btn-save" onclick="changePassword()">✦ Cambiar</button></div>
+      </div>
+      <div class="admin-card" style="margin-top:20px"><div class="admin-card-title">RESETEAR</div>
+        <p style="font-family:'EB Garamond',serif;font-size:15px;color:var(--warm-gray);margin-bottom:20px">Restaura los textos al contenido original. Las imágenes no se borran.</p>
+        <button class="btn-danger" onclick="resetData()">⚠ Restaurar por defecto</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CAPTION MODAL -->
+<div class="caption-modal" id="caption-modal">
+  <div class="caption-box">
+    <h3>Descripción de la foto</h3>
+    <textarea id="caption-input" placeholder="Descripción que aparecerá al pasar el ratón y en el lightbox."></textarea>
+    <div class="caption-hint">Deja en blanco si no quieres descripción.</div>
+    <div class="caption-actions"><button class="btn-sec" onclick="closeCaptionModal()">Cancelar</button><button class="btn-save" onclick="saveCaption()">Guardar</button></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+// ══════════════════════════
+// DATA
+// ══════════════════════════
+const DEFAULT={
+  heroEyebrow:'Estilista · Granada, España',
+  heroTitle:'Dirección artística · Estilismo · Imagen',
+  footerCopy:'© 2026 Jorge Fernández. Todos los derechos reservados.',
+  aboutP1:'Soy Jorge Fernández, estilista y creativo de Granada, España. Mi formación es en Estilismo y Dirección de Peluquería, aunque lo que me mueve es la parte más visual y conceptual del oficio.',
+  aboutP2:'Me interesa la intersección entre cabello, moda, fotografía y cultura visual. Quiero que cada colección sea un concepto propio, no solo un peinado: que cuente algo, que tenga identidad, que deje huella.',
+  s1n:'5',s1t:'Colecciones creadas',
+  s2n:'Granada',s2t:'Base de operaciones',
+  s3n:'∞',s3t:'Conceptos por explorar',
+  contactDesc:'Disponible para colaboraciones, editoriales, dirección artística y proyectos creativos. Basado en Granada, con disponibilidad para desplazamientos.',
+  contactEmail:'hola@jorgefernandez.com',
+  contactPhone:'+34 600 000 000',
+  contactLocation:'Granada, España',
+  igUrl:'#',ttUrl:'#',liUrl:'#',
+  collections:[
+    {name:'Umbra',year:'2024',desc:'La sombra como material. Una exploración de lo que existe entre la luz y la oscuridad, entre la identidad y su negativo.'},
+    {name:'Anastasis',year:'2024',desc:'Del griego: resurrección. Una colección sobre el renacimiento estético, la transformación radical y la belleza que emerge del caos.'},
+    {name:'Atomik Punk',year:'2025',desc:'Energía bruta y estructura fragmentada. Donde la cultura punk se encuentra con la precisión técnica del arte conceptual.'},
+    {name:'3CliPSE',year:'2025',desc:'El eclipse como metáfora: lo que se oculta, lo que se revela, lo que ocurre en el instante de la transición.'},
+    {name:'No Gen',year:'2026',desc:'Sin generación, sin etiqueta. Una propuesta que rechaza la clasificación y propone la identidad fluida como única constante.'}
+  ]
+};
+const DEFAULT_PWD='jorge2026';
+let D=JSON.parse(localStorage.getItem('jf-data')||'null')||JSON.parse(JSON.stringify(DEFAULT));
+let G=JSON.parse(localStorage.getItem('jf-gallery')||'{}');
+let PWD=localStorage.getItem('jf-pwd')||DEFAULT_PWD;
+let sessionAuth=false;
+function save(){try{localStorage.setItem('jf-data',JSON.stringify(D));localStorage.setItem('jf-gallery',JSON.stringify(G));localStorage.setItem('jf-pwd',PWD);}catch(e){}}
+
+// ══════════════════════════
+// RENDER
+// ══════════════════════════
+function renderSite(){
+  document.getElementById('hero-eyebrow').textContent=D.heroEyebrow;
+  document.getElementById('hero-title').textContent=D.heroTitle;
+  document.getElementById('footer-copy').textContent=D.footerCopy;
+  document.getElementById('about-p1').textContent=D.aboutP1;
+  document.getElementById('about-p2').textContent=D.aboutP2;
+  document.getElementById('stat-n1').textContent=D.s1n;
+  document.getElementById('stat-txt1').textContent=D.s1t;
+  document.getElementById('stat-n2').textContent=D.s2n;
+  document.getElementById('stat-txt2').textContent=D.s2t;
+  document.getElementById('stat-n3').textContent=D.s3n;
+  document.getElementById('stat-txt3').textContent=D.s3t;
+  document.getElementById('contact-desc').textContent=D.contactDesc;
+  document.getElementById('contact-email').textContent=D.contactEmail;
+  document.getElementById('contact-phone').textContent=D.contactPhone;
+  document.getElementById('contact-location').textContent=D.contactLocation;
+  document.getElementById('link-email').href='mailto:'+D.contactEmail;
+  document.getElementById('link-phone').href='tel:'+D.contactPhone;
+  document.getElementById('social-ig').href=D.igUrl;
+  document.getElementById('social-tt').href=D.ttUrl;
+  document.getElementById('social-li').href=D.liUrl;
+  renderCollections();
+}
+
+// ══════════════════════════
+// COLLECTIONS RENDER
+// ══════════════════════════
+function renderCollections(){
+  // Gallery images for hero
+  const allImgs=[];
+  D.collections.forEach(c=>{if(G[c.name]&&G[c.name][0])allImgs.push(G[c.name][0].src);});
+
+  // Populate hero images if available
+  if(allImgs[0]){
+    const l=document.getElementById('hi-left-inner');
+    l.innerHTML=`<img src="${allImgs[0]}" alt="" style="width:100%;height:100%;object-fit:cover">`;
+  }
+  if(allImgs[1]){
+    const r=document.getElementById('hi-right-inner');
+    r.innerHTML=`<img src="${allImgs[1]}" alt="" style="width:100%;height:100%;object-fit:cover">`;
+  }
+
+  // Build horizontal editorial moments
+  const track=document.getElementById('col-track');
+  const isMobile=window.innerWidth<=800;
+
+  track.innerHTML=D.collections.map((c,i)=>{
+    const imgs=G[c.name]||[];
+    const src=imgs[0]?imgs[0].src:'';
+    const namePositions=['pos-tl','pos-tr','pos-bl','pos-br','pos-tl'];
+    const imgOffsets=['translateX(-8%)',null,'translateX(8%)','translateX(-5%)','translateX(5%)'];
+    const posClass=namePositions[i%namePositions.length];
+    const imgStyle=imgOffsets[i%imgOffsets.length]?`transform:${imgOffsets[i%imgOffsets.length]}`:'';
+    return `
+    <div class="col-moment" data-idx="${i}" onclick="openGallery(${i})">
+      <div class="col-moment-bg">
+        <div class="col-moment-img" style="${imgStyle}">
+          ${src?`<img src="${src}" alt="${c.name}">`:`<div class="img-tile"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width=".7"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></div>`}
+        </div>
+      </div>
+      <div class="col-moment-name ${posClass}">${c.name}</div>
+      <div class="col-moment-meta">
+        <div class="col-moment-year">${c.year}</div>
+        <div class="col-moment-desc">${c.desc}</div>
+      </div>
+      <div class="col-open-hint"><span class="col-hint-line"></span> ABRIR COLECCIÓN</div>
+    </div>`;
+  }).join('');
+
+  // Fallback list
+  document.getElementById('col-list').innerHTML=D.collections.map((c,i)=>`
+    <div class="col-card" onclick="openGallery(${i})">
+      <div class="col-num">0${i+1}</div>
+      <div class="col-info"><div class="col-name">${c.name}</div><div class="col-year">${c.year}</div></div>
+      <div class="col-desc">${c.desc}</div>
+      <div class="col-arrow">→</div>
+    </div>`).join('');
+
+  // Re-init GSAP after render
+  setTimeout(initCollectionsGSAP,50);
+}
+
+// ══════════════════════════
+// GSAP ANIMATIONS
+// ══════════════════════════
+const isMobile=()=>window.innerWidth<=800;
+const prefersReduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function initGSAP(){
+  if(prefersReduced) return;
+
+  // ── Hero entrance
+  const heroTL=gsap.timeline({defaults:{ease:'power3.out'}});
+  heroTL
+    .from('.hero-eyebrow-inner',{y:'110%',duration:1,delay:.3})
+    .from('#hero-name-jorge',{y:'110%',duration:1.1},'-=.6')
+    .from('#hero-name-fer',{y:'110%',duration:1.1},'-=.9')
+    .from('.hero-title-inner',{y:'110%',opacity:0,duration:.9},'-=.5')
+    .from('#hi-left',{x:isMobile()?-80:-160,opacity:0,duration:1.4,ease:'power2.out'},0.1)
+    .from('#hi-right',{x:isMobile()?80:160,opacity:0,duration:1.4,ease:'power2.out'},0.2)
+    .from('#hi-tr',{y:-80,opacity:0,duration:1.2},0.4)
+    .from('#hi-bl',{y:80,opacity:0,duration:1.2},0.5)
+    .from('.hero-scroll-hint',{opacity:0,duration:.8},'-=.3');
+
+  // ── Hero scroll parallax / dismount
+  const heroParallax=gsap.timeline({
+    scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}
+  });
+  heroParallax
+    .to('#hero-content',{y:isMobile()?-80:-140,opacity:0,ease:'none'},0)
+    .to('#hi-left',{x:isMobile()?-100:-220,opacity:0,ease:'none'},0)
+    .to('#hi-right',{x:isMobile()?100:220,opacity:0,ease:'none'},0)
+    .to('#hi-tr',{y:-100,x:60,opacity:0,ease:'none'},0)
+    .to('#hi-bl',{y:100,x:-60,opacity:0,ease:'none'},0)
+    .to('.hero-bg',{scale:1.08,ease:'none'},0);
+
+  // ── Section labels
+  document.querySelectorAll('.section-label').forEach(el=>{
+    ScrollTrigger.create({trigger:el,start:'top 88%',onEnter:()=>el.classList.add('in-view')});
+  });
+
+  // ── About words stagger
+  gsap.from('.about-word-inner',{
+    y:'120%',opacity:0,
+    stagger:{each:.12,ease:'power2.out'},
+    duration:.9,ease:'power3.out',
+    scrollTrigger:{trigger:'#about-heading',start:'top 80%',toggleActions:'play none none reverse'}
+  });
+  gsap.from('#about-body',{
+    y:40,opacity:0,duration:1,ease:'power2.out',
+    scrollTrigger:{trigger:'#about-body',start:'top 82%',toggleActions:'play none none reverse'}
+  });
+
+  // ── Stats stagger
+  gsap.from('.about-stat',{
+    y:60,opacity:0,
+    stagger:.15,duration:.9,ease:'power3.out',
+    scrollTrigger:{trigger:'#about-stats',start:'top 80%',toggleActions:'play none none reverse'}
+  });
+
+  // ── Contact section
+  gsap.from('#contact-heading',{
+    y:60,opacity:0,duration:1,ease:'power3.out',
+    scrollTrigger:{trigger:'#contact-heading',start:'top 82%',toggleActions:'play none none reverse'}
+  });
+  gsap.from('#contact-links-el .contact-link',{
+    x:-40,opacity:0,stagger:.12,duration:.8,ease:'power2.out',
+    scrollTrigger:{trigger:'#contact-links-el',start:'top 80%',toggleActions:'play none none reverse'}
+  });
+  gsap.from('#contact-form-el',{
+    x:40,opacity:0,duration:1,ease:'power2.out',
+    scrollTrigger:{trigger:'#contact-form-el',start:'top 80%',toggleActions:'play none none reverse'}
+  });
+
+  // ── Social / footer
+  gsap.from('.social-section',{
+    opacity:0,y:30,duration:1,ease:'power2.out',
+    scrollTrigger:{trigger:'.social-section',start:'top 88%',toggleActions:'play none none reverse'}
+  });
+}
+
+function initCollectionsGSAP(){
+  if(prefersReduced) return;
+
+  // Kill previous ScrollTriggers for collections
+  ScrollTrigger.getAll().forEach(st=>{
+    if(st.vars && st.vars.id && st.vars.id.startsWith('col-'))st.kill();
+  });
+
+  const track=document.getElementById('col-track');
+  const pin=document.getElementById('col-pin');
+  const moments=document.querySelectorAll('.col-moment');
+  if(!moments.length)return;
+
+  const totalW=track.scrollWidth;
+  const viewW=window.innerWidth;
+  const scrollDist=totalW-viewW;
+
+  if(isMobile()||scrollDist<=0){
+    // Mobile: show fallback list, hide horizontal track
+    pin.style.display='none';
+    document.getElementById('col-list-wrap').style.display='block';
+    // Animate list items
+    gsap.from('.col-card',{
+      y:50,opacity:0,stagger:.1,duration:.8,ease:'power2.out',
+      scrollTrigger:{trigger:'#col-list-wrap',start:'top 82%',id:'col-list'}
+    });
+    return;
+  }
+
+  // Desktop: horizontal scroll
+  pin.style.display='block';
+  document.getElementById('col-list-wrap').style.display='none';
+
+  gsap.to(track,{
+    x:()=>-scrollDist,
+    ease:'none',
+    scrollTrigger:{
+      trigger:pin,
+      start:'top top',
+      end:()=>'+='+(scrollDist+viewW*0.8),
+      pin:true,
+      scrub:1.2,
+      anticipatePin:1,
+      id:'col-horiz',
+      invalidateOnRefresh:true
+    }
+  });
+
+  // Each moment: image parallax
+  moments.forEach((m,i)=>{
+    const img=m.querySelector('.col-moment-img');
+    if(!img)return;
+    gsap.fromTo(img,
+      {x:60,scale:1.08},
+      {x:-60,scale:1,ease:'none',
+       scrollTrigger:{
+         trigger:m,containerAnimation:gsap.effects&&gsap.effects.containerAnim,
+         start:'left right',end:'right left',scrub:1,
+         id:'col-img-'+i
+       }
+      }
+    );
+  });
+
+  // Collections heading parallax
+  gsap.from('#col-heading .about-word-inner,#col-heading',{
+    y:50,opacity:0,duration:1,ease:'power3.out',
+    scrollTrigger:{trigger:'#colecciones',start:'top 80%',id:'col-head'}
+  });
+}
+
+// ── SCROLL PROGRESS BAR
+window.addEventListener('scroll',()=>{
+  const max=document.documentElement.scrollHeight-window.innerHeight;
+  const pct=max>0?(window.scrollY/max)*100:0;
+  document.getElementById('sp-fill').style.height=pct+'%';
+  // Nav
+  document.getElementById('main-nav').classList.toggle('scrolled',window.scrollY>60);
+},{passive:true});
+
+// ══════════════════════════
+// CURSOR
+// ══════════════════════════
+const cDot=document.getElementById('c-dot');
+const cRing=document.getElementById('c-ring');
+const cLabel=document.getElementById('c-label');
+let mx=0,my=0,rx=0,ry=0;
+const isTouch='ontouchstart' in window;
+if(!isTouch){
+  document.addEventListener('mousemove',e=>{
+    mx=e.clientX;my=e.clientY;
+    cDot.style.left=mx+'px';cDot.style.top=my+'px';
+  });
+  (function animRing(){
+    rx+=(mx-rx)*.12;ry+=(my-ry)*.12;
+    cRing.style.left=rx+'px';cRing.style.top=ry+'px';
+    cLabel.style.left=rx+'px';cLabel.style.top=(ry+28)+'px';
+    requestAnimationFrame(animRing);
+  })();
+
+  function setCursorState(expanded,label){
+    cRing.classList.toggle('expanded',expanded);
+    cLabel.textContent=label||'';
+    cLabel.classList.toggle('visible',!!label);
+  }
+  document.querySelectorAll('.col-moment').forEach(el=>{
+    el.addEventListener('mouseenter',()=>setCursorState(true,'ABRIR'));
+    el.addEventListener('mouseleave',()=>setCursorState(false,''));
+  });
+  document.querySelectorAll('.g-item').forEach(el=>{
+    el.addEventListener('mouseenter',()=>setCursorState(true,'VIEW'));
+    el.addEventListener('mouseleave',()=>setCursorState(false,''));
+  });
+  document.querySelectorAll('a:not(.nav-links a),.form-submit').forEach(el=>{
+    el.addEventListener('mouseenter',()=>setCursorState(true,''));
+    el.addEventListener('mouseleave',()=>setCursorState(false,''));
+  });
+  document.querySelectorAll('.nav-links a,.nav-admin-btn').forEach(el=>{
+    el.addEventListener('mouseenter',()=>cRing.classList.add('expanded'));
+    el.addEventListener('mouseleave',()=>cRing.classList.remove('expanded'));
+  });
+}
+
+// ══════════════════════════
+// GALERÍA
+// ══════════════════════════
+let currentCol=null,lbIndex=0;
+
+function openGallery(idx){
+  const col=D.collections[idx];
+  currentCol=col.name;
+  document.getElementById('g-title').textContent=col.name;
+  document.getElementById('g-desc').textContent=col.desc;
+  renderGallery();
+  document.getElementById('gallery-overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+  // Stagger reveal items
+  setTimeout(()=>{
+    document.querySelectorAll('.g-item').forEach((el,i)=>{
+      setTimeout(()=>el.classList.add('revealed'),i*60);
+    });
+  },400);
+}
+function closeGallery(){
+  const ov=document.getElementById('gallery-overlay');
+  ov.classList.remove('open');
+  document.body.style.overflow='';
+}
+function renderGallery(){
+  const imgs=G[currentCol]||[];
+  const grid=document.getElementById('gallery-grid');
+  if(!imgs.length){
+    grid.innerHTML=`<div style="grid-column:1/-1;padding:80px;text-align:center;font-family:'EB Garamond',serif;font-size:18px;font-style:italic;color:var(--stone)">Aún no hay fotos en esta colección.</div>`;
+    return;
+  }
+  grid.innerHTML=imgs.map((img,i)=>`
+    <div class="g-item" onclick="openLb(${i})">
+      <img src="${img.src}" alt="Foto ${i+1}">
+      ${img.caption?`<div class="g-caption"><div class="g-caption-text">${img.caption}</div></div>`:''}
+    </div>`).join('');
+  // Cursor on gallery items
+  if(!isTouch){
+    document.querySelectorAll('.g-item').forEach(el=>{
+      el.addEventListener('mouseenter',()=>setCursorState(true,'VIEW'));
+      el.addEventListener('mouseleave',()=>setCursorState(false,''));
+    });
+  }
+}
+
+// LIGHTBOX with slide transition
+function openLb(idx){
+  lbIndex=idx;
+  renderLb();
+  document.getElementById('lightbox').classList.add('open');
+}
+function renderLb(dir){
+  const imgs=G[currentCol]||[];
+  const img=imgs[lbIndex];
+  if(!img)return;
+  const el=document.getElementById('lb-img');
+  if(dir){
+    el.className=dir>0?'sliding-out-left':'sliding-out-right';
+    setTimeout(()=>{
+      el.src=img.src;
+      el.className=dir>0?'sliding-in-left':'sliding-in-right';
+    },180);
+  }else{
+    el.src=img.src;el.className='';
+  }
+  const cap=document.getElementById('lb-caption');
+  cap.style.opacity=0;
+  setTimeout(()=>{cap.textContent=img.caption||'';cap.style.opacity=1;},200);
+  document.getElementById('lb-counter').textContent=`${lbIndex+1} / ${imgs.length}`;
+}
+function lbNav(dir){
+  const imgs=G[currentCol]||[];
+  lbIndex=(lbIndex+dir+imgs.length)%imgs.length;
+  renderLb(dir);
+}
+function closeLb(){document.getElementById('lightbox').classList.remove('open');}
+function lbBgClose(e){if(e.target===document.getElementById('lightbox'))closeLb();}
+
+// Swipe support
+let touchStartX=0;
+document.getElementById('lightbox').addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX},{passive:true});
+document.getElementById('lightbox').addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-touchStartX;
+  if(Math.abs(dx)>50)lbNav(dx<0?1:-1);
+});
+
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('lightbox').classList.contains('open')){
+    if(e.key==='ArrowLeft')lbNav(-1);
+    if(e.key==='ArrowRight')lbNav(1);
+    if(e.key==='Escape')closeLb();
+  }
+  if(document.getElementById('gallery-overlay').classList.contains('open')&&e.key==='Escape')closeGallery();
+});
+
+// ══════════════════════════
+// LOGIN / ADMIN
+// ══════════════════════════
+function openLogin(){document.getElementById('admin-login').classList.add('open');document.getElementById('pwd-input').value='';document.getElementById('login-err').textContent='';setTimeout(()=>document.getElementById('pwd-input').focus(),200);}
+function closeLogin(){document.getElementById('admin-login').classList.remove('open');}
+function doLogin(){
+  const v=document.getElementById('pwd-input').value;
+  if(v===PWD){sessionAuth=true;closeLogin();openAdmin();}
+  else{document.getElementById('login-err').textContent='Contraseña incorrecta.';document.getElementById('pwd-input').value='';document.getElementById('pwd-input').focus();}
+}
+function openAdmin(){
+  if(!sessionAuth){openLogin();return;}
+  loadAdminFields();
+  document.getElementById('admin-panel').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function logout(){sessionAuth=false;document.getElementById('admin-panel').classList.remove('open');document.body.style.overflow='';showToast('Sesión cerrada','ok');}
+function switchTab(name){
+  document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.admin-nav-item').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if(name==='galeria')renderAdminGallery();
+  if(name==='colecciones')renderAdminCols();
+}
+function loadAdminFields(){
+  document.getElementById('a-eyebrow').value=D.heroEyebrow;
+  document.getElementById('a-htitle').value=D.heroTitle;
+  document.getElementById('a-copy').value=D.footerCopy;
+  document.getElementById('a-p1').value=D.aboutP1;
+  document.getElementById('a-p2').value=D.aboutP2;
+  document.getElementById('a-s1n').value=D.s1n;document.getElementById('a-s1t').value=D.s1t;
+  document.getElementById('a-s2n').value=D.s2n;document.getElementById('a-s2t').value=D.s2t;
+  document.getElementById('a-s3n').value=D.s3n;document.getElementById('a-s3t').value=D.s3t;
+  document.getElementById('a-cdesc').value=D.contactDesc;
+  document.getElementById('a-email').value=D.contactEmail;
+  document.getElementById('a-phone').value=D.contactPhone;
+  document.getElementById('a-loc').value=D.contactLocation;
+  document.getElementById('a-ig').value=D.igUrl==='#'?'':D.igUrl;
+  document.getElementById('a-tt').value=D.ttUrl==='#'?'':D.ttUrl;
+  document.getElementById('a-li').value=D.liUrl==='#'?'':D.liUrl;
+  renderAdminCols();
+}
+function saveGeneral(){D.heroEyebrow=document.getElementById('a-eyebrow').value||D.heroEyebrow;D.heroTitle=document.getElementById('a-htitle').value||D.heroTitle;D.footerCopy=document.getElementById('a-copy').value||D.footerCopy;save();renderSite();showToast('General guardado','ok');}
+function saveSobre(){D.aboutP1=document.getElementById('a-p1').value||D.aboutP1;D.aboutP2=document.getElementById('a-p2').value||D.aboutP2;D.s1n=document.getElementById('a-s1n').value||D.s1n;D.s1t=document.getElementById('a-s1t').value||D.s1t;D.s2n=document.getElementById('a-s2n').value||D.s2n;D.s2t=document.getElementById('a-s2t').value||D.s2t;D.s3n=document.getElementById('a-s3n').value||D.s3n;D.s3t=document.getElementById('a-s3t').value||D.s3t;save();renderSite();showToast('Sobre mí guardado','ok');}
+function saveContacto(){D.contactDesc=document.getElementById('a-cdesc').value||D.contactDesc;D.contactEmail=document.getElementById('a-email').value||D.contactEmail;D.contactPhone=document.getElementById('a-phone').value||D.contactPhone;D.contactLocation=document.getElementById('a-loc').value||D.contactLocation;save();renderSite();showToast('Contacto guardado','ok');}
+function saveRedes(){D.igUrl=document.getElementById('a-ig').value||'#';D.ttUrl=document.getElementById('a-tt').value||'#';D.liUrl=document.getElementById('a-li').value||'#';save();renderSite();showToast('Redes guardadas','ok');}
+function renderAdminCols(){
+  document.getElementById('admin-cols-list').innerHTML=D.collections.map((c,i)=>`
+    <div class="col-admin-block" id="cab-${i}">
+      <div class="col-admin-header" onclick="toggleCol(${i})"><h4>${c.name}</h4><span class="col-admin-toggle">▼</span></div>
+      <div class="col-admin-body">
+        <div class="admin-row"><div class="a-field"><label>Nombre</label><input type="text" id="cn-${i}" value="${c.name}"></div><div class="a-field"><label>Año</label><input type="text" id="cy-${i}" value="${c.year}"></div></div>
+        <div class="a-field"><label>Descripción</label><textarea id="cd-${i}">${c.desc}</textarea></div>
+        <div style="display:flex;gap:10px;margin-top:8px"><button class="btn-danger" onclick="deleteCol(${i})">✕ Eliminar</button></div>
+      </div>
+    </div>`).join('');
+}
+function toggleCol(i){document.getElementById('cab-'+i).classList.toggle('collapsed');}
+function saveColecciones(){D.collections=D.collections.map((c,i)=>({name:document.getElementById('cn-'+i).value||c.name,year:document.getElementById('cy-'+i).value||c.year,desc:document.getElementById('cd-'+i).value||c.desc}));save();renderSite();renderAdminCols();showToast('Colecciones guardadas','ok');}
+function addColeccion(){D.collections.push({name:'Nueva colección',year:'2026',desc:'Descripción.'});G['Nueva colección']=[];save();renderSite();renderAdminCols();showToast('Colección añadida','ok');}
+function deleteCol(i){if(!confirm(`¿Eliminar "${D.collections[i].name}"?`))return;delete G[D.collections[i].name];D.collections.splice(i,1);save();renderSite();renderAdminCols();showToast('Colección eliminada','ok');}
+function renderAdminGallery(){
+  document.getElementById('admin-gallery-list').innerHTML=D.collections.map(c=>{
+    const imgs=G[c.name]||[];
+    return `<div class="admin-gallery-col"><div class="agc-header"><div class="agc-name">${c.name}</div><div class="agc-count">${imgs.length} foto${imgs.length!==1?'s':''}</div></div>
+    <div class="agc-grid">
+      ${imgs.map((img,i)=>`<div class="agc-thumb"><img src="${img.src}" alt=""><div class="agc-thumb-actions"><button class="agc-action edit" onclick="openCaptionModal('${c.name}',${i})">✎ Descripción</button><button class="agc-action del" onclick="deleteGalleryImg('${c.name}',${i})">✕ Eliminar</button></div></div>`).join('')}
+      <button class="agc-add" onclick="uploadToCol('${c.name}')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8A8480" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span>Añadir fotos</span></button>
+    </div></div>`;
+  }).join('');
+}
+function uploadToCol(colName){
+  const input=document.createElement('input');input.type='file';input.accept='image/*';input.multiple=true;
+  input.onchange=e=>{
+    const files=Array.from(e.target.files);let loaded=0;
+    files.forEach(file=>{
+      const r=new FileReader();
+      r.onload=ev=>{if(!G[colName])G[colName]=[];G[colName].push({src:ev.target.result,caption:''});loaded++;if(loaded===files.length){save();renderAdminGallery();renderSite();showToast(`${files.length} foto${files.length>1?'s':''} añadida${files.length>1?'s':''}  a "${colName}"`, 'ok');}};
+      r.readAsDataURL(file);
+    });
+  };input.click();
+}
+function deleteGalleryImg(colName,idx){if(!confirm('¿Eliminar esta foto?'))return;G[colName].splice(idx,1);save();renderAdminGallery();renderSite();showToast('Foto eliminada','ok');}
+let captionTarget=null;
+function openCaptionModal(colName,idx){captionTarget={colName,idx};document.getElementById('caption-input').value=(G[colName][idx]||{}).caption||'';document.getElementById('caption-modal').classList.add('open');}
+function closeCaptionModal(){document.getElementById('caption-modal').classList.remove('open');captionTarget=null;}
+function saveCaption(){if(!captionTarget)return;const{colName,idx}=captionTarget;G[colName][idx].caption=document.getElementById('caption-input').value;save();closeCaptionModal();renderAdminGallery();showToast('Descripción guardada','ok');}
+function changePassword(){const old=document.getElementById('pwd-old').value,n=document.getElementById('pwd-new').value,c=document.getElementById('pwd-confirm').value;if(old!==PWD){showToast('Contraseña actual incorrecta','err');return;}if(!n||n.length<6){showToast('Mínimo 6 caracteres','err');return;}if(n!==c){showToast('Las contraseñas no coinciden','err');return;}PWD=n;save();document.getElementById('pwd-old').value='';document.getElementById('pwd-new').value='';document.getElementById('pwd-confirm').value='';showToast('Contraseña cambiada','ok');}
+function resetData(){if(!confirm('¿Restaurar contenido por defecto?'))return;D=JSON.parse(JSON.stringify(DEFAULT));save();renderSite();loadAdminFields();showToast('Contenido restaurado','ok');}
+function submitForm(){showToast('Mensaje enviado. ¡Gracias!','ok');}
+function showToast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(type?' '+type:'');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+
+// ══════════════════════════
+// INIT
+// ══════════════════════════
+renderSite();
+// Wait for fonts + layout
+window.addEventListener('load',()=>{
+  initGSAP();
+  ScrollTrigger.refresh();
+});
+window.addEventListener('resize',()=>{
+  ScrollTrigger.getAll().forEach(st=>{if(st.vars.id&&st.vars.id.startsWith('col-'))st.kill();});
+  renderCollections();
+  ScrollTrigger.refresh();
+});
+</script>
+</body>
+</html>
